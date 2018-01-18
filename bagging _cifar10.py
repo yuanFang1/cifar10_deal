@@ -56,12 +56,6 @@ def conv_net(image_holder,weights,biases):
 
     out = tf.add(tf.matmul(fc1, weights['out']), biases['out'])
     return out
-def myloss(logits,labels):
-    labels = tf.cast(labels,tf.int64)
-    cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits,labels=labels,name='cross_entropy_per_example')
-    cross_entropy_mean = tf.reduce_mean(cross_entropy,name='cross_entropy')
-    tf.add_to_collection('losses',cross_entropy_mean)
-    return tf.add_n(tf.get_collection('losses'),name='total_loss')
 
 def create_graph():
     weights = {
@@ -98,20 +92,16 @@ sess = tf.InteractiveSession()
 tf.global_variables_initializer().run()
 tf.train.start_queue_runners()
 
-image_batch,label_batch = sess.run([images_train,labels_train])
-image_batch2,label_batch2 = sess.run([images_train,labels_train])
-image_batch3,label_batch3 = sess.run([images_train,labels_train])
-image_batch4,label_batch4 = sess.run([images_train,labels_train])
-image_batch5,label_batch5 = sess.run([images_train,labels_train])
+
 #训练开始
 train_time = time.time()
 for step in range(max_steps):
     start_time = time.time()
-    # image_batch,label_batch = sess.run([images_train,labels_train])
-    # image_batch2,label_batch2 = sess.run([images_train,labels_train])
-    # image_batch3,label_batch3 = sess.run([images_train,labels_train])
-    # image_batch4,label_batch4 = sess.run([images_train,labels_train])
-    # image_batch5,label_batch5 = sess.run([images_train,labels_train])
+    image_batch,label_batch = sess.run([images_train,labels_train])
+    image_batch2,label_batch2 = sess.run([images_train,labels_train])
+    image_batch3,label_batch3 = sess.run([images_train,labels_train])
+    image_batch4,label_batch4 = sess.run([images_train,labels_train])
+    image_batch5,label_batch5 = sess.run([images_train,labels_train])
     _,loss_value =sess.run([train_op,loss],feed_dict={image_holder:image_batch,label_holder:label_batch})
     _,loss_value2 =sess.run([train_op2,loss2],feed_dict={image_holder:image_batch2,label_holder:label_batch2})
     _,loss_value3 =sess.run([train_op3,loss3],feed_dict={image_holder:image_batch3,label_holder:label_batch3})
@@ -154,7 +144,7 @@ while step < num_iter:
     temppred.append(predictions3)
     temppred.append(predictions4)
     temppred.append(predictions5)
-
+    #获得投票结果
     temppred = np.array(temppred)
     temp =np.zeros(batch_size)
     for j in range(batch_size):
